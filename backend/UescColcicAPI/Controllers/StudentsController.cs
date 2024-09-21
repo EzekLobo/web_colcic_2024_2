@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using UescColcicAPI.Services.BD.Interfaces;
 using UescColcicAPI.Core;
-using UescColcicAPI.Services.ViewModels; // Adiciona a referência para o ViewModel
+using UescColcicAPI.Services.ViewModels; 
 using System.Collections.Generic;
 using System;
 
@@ -43,7 +43,6 @@ namespace UescColcicAPI.Controllers
             }
         }
 
-        // Criação de um novo estudante usando a StudentViewModel
         [HttpPost(Name = "CreateStudent")]
         public ActionResult<Student> Post([FromBody] StudentViewModel studentViewModel)
         {
@@ -52,9 +51,12 @@ namespace UescColcicAPI.Controllers
                 var student = new Student
                 {
                     Name = studentViewModel.Name,
-                    Email = studentViewModel.Email
+                    Email = studentViewModel.Email,
+                    Registration = studentViewModel.Registration,
+                    Course = studentViewModel.Course, 
+                    Bio = studentViewModel.Bio 
                 };
-                _studentsCRUD.Create(student); // O ID é gerado automaticamente
+                _studentsCRUD.Create(student);
 
                 return CreatedAtRoute("GetStudent", new { id = student.StudentId }, student);
             }
@@ -64,7 +66,6 @@ namespace UescColcicAPI.Controllers
             }
         }
 
-        // Atualização de estudante usando a StudentViewModel, sem expor o ID
         [HttpPut("{id}", Name = "UpdateStudent")]
         public ActionResult Update(int id, [FromBody] StudentViewModel studentViewModel)
         {
@@ -76,9 +77,12 @@ namespace UescColcicAPI.Controllers
                     return NotFound($"Student with ID {id} not found.");
                 }
 
-                // Atualiza os campos exceto o ID
+                // Atualiza os campos
                 existingStudent.Name = studentViewModel.Name;
                 existingStudent.Email = studentViewModel.Email;
+                existingStudent.Registration = studentViewModel.Registration;
+                existingStudent.Course = studentViewModel.Course;
+                existingStudent.Bio = studentViewModel.Bio;
 
                 _studentsCRUD.Update(existingStudent);
                 return NoContent();
