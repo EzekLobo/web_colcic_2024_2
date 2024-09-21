@@ -2,10 +2,12 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using UescColcicAPI.Services.BD.Interfaces;
 using UescColcicAPI.Core;
-using Microsoft.AspNetCore.Http.HttpResults;
+using UescColcicAPI.Services.ViewModels; // Adiciona a referência para o ViewModel
+using System.Collections.Generic;
+using System;
 
-namespace UescColcicAPI.Controllers;
-
+namespace UescColcicAPI.Controllers
+{
     [ApiController]
     [Route("api/[controller]")]
     public class StudentsController : ControllerBase
@@ -17,7 +19,6 @@ namespace UescColcicAPI.Controllers;
             _studentsCRUD = studentsCRUD;
         }
 
-       
         [HttpGet(Name = "GetStudents")]
         public IEnumerable<Student> Get()
         {
@@ -42,16 +43,70 @@ namespace UescColcicAPI.Controllers;
             }
         }
 
-        [HttpPut(Name = "UpdateStudent")]
-        public void Update(Student student)
+        // Criação de um novo estudante usando a StudentViewModel
+        [HttpPost(Name = "CreateStudent")]
+        public ActionResult<Student> Post([FromBody] StudentViewModel studentViewModel)
         {
-            _studentsCRUD.Update(student);
+            try
+            {
+                var student = new Student
+                {
+                    Name = studentViewModel.Name,
+                    Email = studentViewModel.Email
+                };
+                _studentsCRUD.Create(student); // O ID é gerado automaticamente
 
+                return CreatedAtRoute("GetStudent", new { id = student.StudentId }, student);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
 
-        [HttpDelete(Name = "DeleteStudent")]
-        public void Delete(Student entity)
+        // Atualização de estudante usando a StudentViewModel, sem expor o ID
+        [HttpPut("{id}", Name = "UpdateStudent")]
+        public ActionResult Update(int id, [FromBody] StudentViewModel studentViewModel)
         {
-            _studentsCRUD.Delete(entity);
+            try
+            {
+                var existingStudent = _studentsCRUD.ReadById(id);
+                if (existingStudent == null)
+                {
+                    return NotFound($"Student with ID {id} not found.");
+                }
+
+                // Atualiza os campos exceto o ID
+                existingStudent.Name = studentViewModel.Name;
+                existingStudent.Email = studentViewModel.Email;
+
+                _studentsCRUD.Update(existingStudent);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        [HttpDelete("{id}", Name = "DeleteStudent")]
+        public ActionResult Delete(int id)
+        {
+            try
+            {
+                var student = _studentsCRUD.ReadById(id);
+                if (student == null)
+                {
+                    return NotFound($"Student with ID {id} not found.");
+                }
+
+                _studentsCRUD.Delete(student);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
     }
+}
