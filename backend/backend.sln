@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UescColcicAPI.Core", "UescC
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UescColcicAPI.Services", "UescColcicAPI.Service\UescColcicAPI.Services.csproj", "{AF80AD26-A99B-4C4B-9B4A-FD6D82050DA1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UescColcicAPI.Infra", "UescColcicAPI.Infra\UescColcicAPI.Infra.csproj", "{FB3F117B-447D-4A4E-96A6-5E967F44AC6D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{AF80AD26-A99B-4C4B-9B4A-FD6D82050DA1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AF80AD26-A99B-4C4B-9B4A-FD6D82050DA1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AF80AD26-A99B-4C4B-9B4A-FD6D82050DA1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FB3F117B-447D-4A4E-96A6-5E967F44AC6D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FB3F117B-447D-4A4E-96A6-5E967F44AC6D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FB3F117B-447D-4A4E-96A6-5E967F44AC6D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FB3F117B-447D-4A4E-96A6-5E967F44AC6D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
