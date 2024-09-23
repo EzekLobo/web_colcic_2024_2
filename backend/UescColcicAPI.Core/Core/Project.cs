@@ -12,7 +12,7 @@ namespace UescColcicAPI.Core
         public DateTime EndDate { get; set; }
 
         // FK para Professor
-        public int ProfessorId { get; set; }
+        public required int ProfessorId { get; set; }
 
         // Propriedade de navegação para Professor
         public Professor? Professor { get; set; }

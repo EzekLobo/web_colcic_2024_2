@@ -1,9 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-using UescColcicAPI.Core;
 using UescColcicAPI.Services.BD.Interfaces;
-using System;
 using UescColcicAPI.Services.ViewModel;
+using System;
+using System.Collections.Generic;
 
 namespace UescColcicAPI.Controllers
 {
@@ -18,14 +17,24 @@ namespace UescColcicAPI.Controllers
             _projectsCRUD = projectsCRUD;
         }
 
+        // GET: api/Projects
         [HttpGet(Name = "GetProjects")]
-        public IEnumerable<Project> Get()
+        public ActionResult<IEnumerable<ProjectViewModel>> Get()
         {
-            return _projectsCRUD.ReadAll();
+            try
+            {
+                var projects = _projectsCRUD.ReadAll();
+                return Ok(projects);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
 
+        // GET: api/Projects/5
         [HttpGet("{id}", Name = "GetProject")]
-        public ActionResult<Project> Get(int id)
+        public ActionResult<ProjectViewModel> Get(int id)
         {
             try
             {
@@ -34,6 +43,7 @@ namespace UescColcicAPI.Controllers
                 {
                     return NotFound($"Project with ID {id} not found.");
                 }
+
                 return Ok(project);
             }
             catch (Exception ex)
@@ -42,30 +52,22 @@ namespace UescColcicAPI.Controllers
             }
         }
 
+        // POST: api/Projects
         [HttpPost(Name = "CreateProject")]
-        public ActionResult<Project> Post([FromBody] ProjectViewModel projectViewModel)
+        public ActionResult Create([FromBody] ProjectViewModel projectViewModel)
         {
             try
             {
-                var project = new Project
-                {
-                    Title = projectViewModel.Title,
-                    Description = projectViewModel.Description,
-                    Type = projectViewModel.Type,
-                    StartDate = projectViewModel.StartDate,
-                    EndDate = projectViewModel.EndDate
-                };
-
-                _projectsCRUD.Create(project);
-                return CreatedAtRoute("GetProject", new { id = project.ProjectId }, project);
+                int newProjectId = _projectsCRUD.Create(projectViewModel);
+                return CreatedAtRoute("GetProject", new { id = newProjectId }, projectViewModel);
             }
             catch (Exception ex)
             {
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
-        
 
+        // PUT: api/Projects/5
         [HttpPut("{id}", Name = "UpdateProject")]
         public ActionResult Update(int id, [FromBody] ProjectViewModel projectViewModel)
         {
@@ -77,14 +79,7 @@ namespace UescColcicAPI.Controllers
                     return NotFound($"Project with ID {id} not found.");
                 }
 
-                // Atualiza os campos
-                existingProject.Title = projectViewModel.Title;
-                existingProject.Description = projectViewModel.Description;
-                existingProject.Type = projectViewModel.Type;
-                existingProject.StartDate = projectViewModel.StartDate;
-                existingProject.EndDate = projectViewModel.EndDate;
-
-                _projectsCRUD.Update(existingProject);
+                _projectsCRUD.Update(id, projectViewModel);
                 return NoContent();
             }
             catch (Exception ex)
@@ -93,6 +88,7 @@ namespace UescColcicAPI.Controllers
             }
         }
 
+        // DELETE: api/Projects/5
         [HttpDelete("{id}", Name = "DeleteProject")]
         public ActionResult Delete(int id)
         {
@@ -104,7 +100,7 @@ namespace UescColcicAPI.Controllers
                     return NotFound($"Project with ID {id} not found.");
                 }
 
-                _projectsCRUD.Delete(project);
+                _projectsCRUD.Delete(id);
                 return NoContent();
             }
             catch (Exception ex)

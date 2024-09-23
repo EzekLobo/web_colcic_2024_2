@@ -1,11 +1,8 @@
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using UescColcicAPI.Services.BD.Interfaces;
-using UescColcicAPI.Core;
-using UescColcicAPI.Services.ViewModels; 
-using System.Collections.Generic;
-using System;
 using UescColcicAPI.Services.ViewModel;
+using System;
+using System.Collections.Generic;
 
 namespace UescColcicAPI.Controllers
 {
@@ -20,14 +17,24 @@ namespace UescColcicAPI.Controllers
             _professorsCRUD = professorsCRUD;
         }
 
+        // GET: api/Professors
         [HttpGet(Name = "GetProfessors")]
-        public IEnumerable<Professor> Get()
+        public ActionResult<IEnumerable<ProfessorViewModel>> Get()
         {
-            return _professorsCRUD.ReadAll();
+            try
+            {
+                var professors = _professorsCRUD.ReadAll();
+                return Ok(professors); // A lógica de conversão para ProfessorViewModel está no service
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
 
+        // GET: api/Professors/5
         [HttpGet("{id}", Name = "GetProfessor")]
-        public ActionResult<Professor> Get(int id)
+        public ActionResult<ProfessorViewModel> Get(int id)
         {
             try
             {
@@ -36,7 +43,8 @@ namespace UescColcicAPI.Controllers
                 {
                     return NotFound($"Professor with ID {id} not found.");
                 }
-                return Ok(professor);
+
+                return Ok(professor); // O retorno já é ProfessorViewModel
             }
             catch (Exception ex)
             {
@@ -44,21 +52,14 @@ namespace UescColcicAPI.Controllers
             }
         }
 
+        // POST: api/Professors
         [HttpPost(Name = "CreateProfessor")]
-        public ActionResult<Professor> Post([FromBody] ProfessorViewModel professorViewModel)
+        public ActionResult Create([FromBody] ProfessorViewModel professorViewModel)
         {
             try
             {
-                var professor = new Professor
-                {
-                    Name = professorViewModel.Name,
-                    Email = professorViewModel.Email,
-                    Department = professorViewModel.Department,
-                    Bio = professorViewModel.Bio
-                };
-                _professorsCRUD.Create(professor);
-
-                return CreatedAtRoute("GetProfessor", new { id = professor.ProfessorId }, professor);
+                int newProfessorId = _professorsCRUD.Create(professorViewModel);
+                return CreatedAtRoute("GetProfessor", new { id = newProfessorId }, professorViewModel);
             }
             catch (Exception ex)
             {
@@ -66,6 +67,7 @@ namespace UescColcicAPI.Controllers
             }
         }
 
+        // PUT: api/Professors/5
         [HttpPut("{id}", Name = "UpdateProfessor")]
         public ActionResult Update(int id, [FromBody] ProfessorViewModel professorViewModel)
         {
@@ -77,13 +79,7 @@ namespace UescColcicAPI.Controllers
                     return NotFound($"Professor with ID {id} not found.");
                 }
 
-                // Atualiza os campos
-                existingProfessor.Name = professorViewModel.Name;
-                existingProfessor.Email = professorViewModel.Email;
-                existingProfessor.Department = professorViewModel.Department;
-                existingProfessor.Bio = professorViewModel.Bio;
-
-                _professorsCRUD.Update(existingProfessor);
+                _professorsCRUD.Update(id, professorViewModel);
                 return NoContent();
             }
             catch (Exception ex)
@@ -92,6 +88,7 @@ namespace UescColcicAPI.Controllers
             }
         }
 
+        // DELETE: api/Professors/5
         [HttpDelete("{id}", Name = "DeleteProfessor")]
         public ActionResult Delete(int id)
         {
@@ -103,7 +100,7 @@ namespace UescColcicAPI.Controllers
                     return NotFound($"Professor with ID {id} not found.");
                 }
 
-                _professorsCRUD.Delete(professor);
+                _professorsCRUD.Delete(id);
                 return NoContent();
             }
             catch (Exception ex)
@@ -112,4 +109,4 @@ namespace UescColcicAPI.Controllers
             }
         }
     }
-}
+    }

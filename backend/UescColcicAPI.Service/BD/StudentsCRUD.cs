@@ -1,5 +1,6 @@
 ﻿using UescColcicAPI.Services.BD.Interfaces;
 using UescColcicAPI.Core;
+using UescColcicAPI.Services.ViewModels;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -15,56 +16,91 @@ namespace UescColcicAPI.Services.BD
             new Student { StudentId = 4, Registration = "REG126", Name = "Gabriela", Email = "gabriela.cic@uesc.br", Course = "Artificial Intelligence", Bio = "Exploring AI and machine learning." }
         };
 
-        public void Create(Student entity)
+        public int Create(StudentViewModel studentViewModel)
         {
-            // Verifica se o registro já existe
-            if (Students.Any(s => s.Registration == entity.Registration))
+            // Converte o StudentViewModel para Student
+            var student = new Student
             {
-                throw new InvalidOperationException($"A student with registration {entity.Registration} already exists.");
+                Registration = studentViewModel.Registration,
+                Name = studentViewModel.Name,
+                Email = studentViewModel.Email,
+                Course = studentViewModel.Course,
+                Bio = studentViewModel.Bio
+            };
+
+            // Verifica se o registro já existe
+            if (Students.Any(s => s.Registration == student.Registration))
+            {
+                throw new InvalidOperationException($"A student with registration {student.Registration} already exists.");
             }
 
             // Gera automaticamente um ID para o novo estudante
-            entity.StudentId = Students.Any() ? Students.Max(s => s.StudentId) + 1 : 1;
-            Students.Add(entity);
+            student.StudentId = Students.Any() ? Students.Max(s => s.StudentId) + 1 : 1;
+            Students.Add(student);
+
+            return student.StudentId;
         }
 
-        public void Delete(Student entity)
+        public void Update(int id, StudentViewModel studentViewModel)
         {
-            var student = this.Find(entity.StudentId);
+            var student = this.Find(id);
+            if (student is not null)
+            {
+                // Verifica se outro estudante já usa o mesmo registration
+                if (Students.Any(s => s.Registration == studentViewModel.Registration && s.StudentId != id))
+                {
+                    throw new InvalidOperationException($"Another student with registration {studentViewModel.Registration} already exists.");
+                }
+
+                // Atualiza os campos
+                student.Name = studentViewModel.Name;
+                student.Email = studentViewModel.Email;
+                student.Registration = studentViewModel.Registration;
+                student.Course = studentViewModel.Course;
+                student.Bio = studentViewModel.Bio;
+            }
+        }
+
+        public void Delete(int id)
+        {
+            var student = this.Find(id);
             if (student is not null)
             {
                 Students.Remove(student);
             }
         }
 
-        public IEnumerable<Student> ReadAll()
+        public Student ReadById(int id)
         {
-            return Students;
-        }
-
-        public Student? ReadById(int id)
-        {
-            return this.Find(id);
-        }
-
-        public void Update(Student entity)
-        {
-            var student = this.Find(entity.StudentId);
+            var student = this.Find(id);
             if (student is not null)
             {
-                // Verifica se outro estudante já usa o mesmo registration
-                if (Students.Any(s => s.Registration == entity.Registration && s.StudentId != entity.StudentId))
+                // Converte Student para StudentViewModel
+                return new Student
                 {
-                    throw new InvalidOperationException($"Another student with registration {entity.Registration} already exists.");
-                }
-
-                // Atualiza os campos
-                student.Name = entity.Name;
-                student.Email = entity.Email;
-                student.Registration = entity.Registration;
-                student.Course = entity.Course; 
-                student.Bio = entity.Bio; 
+                    StudentId = student.StudentId,
+                    Registration = student.Registration,
+                    Name = student.Name,
+                    Email = student.Email,
+                    Course = student.Course,
+                    Bio = student.Bio
+                };
             }
+            return null;
+        }
+
+        public List<Student> ReadAll()
+        {
+            // Converte a lista de Students para StudentViewModels
+            return Students.Select(student => new Student
+            {
+                StudentId = student.StudentId,
+                Registration = student.Registration,
+                Name = student.Name,
+                Email = student.Email,
+                Course = student.Course,
+                Bio = student.Bio
+            }).ToList();
         }
 
         // Busca um estudante por ID

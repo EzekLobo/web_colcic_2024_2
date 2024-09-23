@@ -1,5 +1,6 @@
 using UescColcicAPI.Services.BD.Interfaces;
 using UescColcicAPI.Core;
+using UescColcicAPI.Services.ViewModel;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -13,41 +14,72 @@ namespace UescColcicAPI.Services.BD
             new Professor { ProfessorId = 2, Name = "Dr. Jane Smith", Email = "jane.smith@university.com", Department = "Mathematics", Bio = "Specialist in algebra and number theory" }
         };
 
-        public void Create(Professor entity)
+        public int Create(ProfessorViewModel professorViewModel)
         {
-            entity.ProfessorId = Professors.Max(p => p.ProfessorId) + 1;
-            Professors.Add(entity);
+            var professor = new Professor
+            {
+                Name = professorViewModel.Name,
+                Email = professorViewModel.Email,
+                Department = professorViewModel.Department,
+                Bio = professorViewModel.Bio
+            };
+
+            if (Professors.Any(p => p.Email == professor.Email))
+            {
+                throw new InvalidOperationException($"A professor with email {professor.Email} already exists.");
+            }
+
+            professor.ProfessorId = Professors.Any() ? Professors.Max(p => p.ProfessorId) + 1 : 1;
+            Professors.Add(professor);
+            return professor.ProfessorId;
         }
 
-        public void Delete(Professor entity)
+        public void Update(int id, ProfessorViewModel professorViewModel)
         {
-            var professor = ReadById(entity.ProfessorId);
+            var professor = Find(id);
+            if (professor is not null)
+            {
+                if (Professors.Any(p => p.Email == professorViewModel.Email && p.ProfessorId != id))
+                {
+                    throw new InvalidOperationException($"Another professor with email {professorViewModel.Email} already exists.");
+                }
+
+                professor.Name = professorViewModel.Name;
+                professor.Email = professorViewModel.Email;
+                professor.Department = professorViewModel.Department;
+                professor.Bio = professorViewModel.Bio;
+            }
+        }
+
+        public void Delete(int id)
+        {
+            var professor = Find(id);
             if (professor != null)
             {
                 Professors.Remove(professor);
             }
         }
 
-        public IEnumerable<Professor> ReadAll()
+        public Professor ReadById(int id)
         {
-            return Professors;
+            return Find(id);
         }
 
-        public Professor? ReadById(int id)
+        public List<Professor> ReadAll()
+        {
+            return Professors.Select(professor => new Professor
+            {
+                ProfessorId = professor.ProfessorId,
+                Name = professor.Name,
+                Email = professor.Email,
+                Department = professor.Department,
+                Bio = professor.Bio
+            }).ToList();
+        }
+
+        private Professor? Find(int id)
         {
             return Professors.FirstOrDefault(p => p.ProfessorId == id);
-        }
-
-        public void Update(Professor entity)
-        {
-            var professor = ReadById(entity.ProfessorId);
-            if (professor != null)
-            {
-                professor.Name = entity.Name;
-                professor.Email = entity.Email;
-                professor.Department = entity.Department;
-                professor.Bio = entity.Bio;
-            }
         }
     }
 }

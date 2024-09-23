@@ -1,8 +1,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using UescColcicAPI.Services.BD.Interfaces;
-using UescColcicAPI.Core;
-using UescColcicAPI.Services.ViewModels; 
+using UescColcicAPI.Services.ViewModels;
 using System.Collections.Generic;
 using System;
 
@@ -20,13 +19,21 @@ namespace UescColcicAPI.Controllers
         }
 
         [HttpGet(Name = "GetStudents")]
-        public IEnumerable<Student> Get()
+        public ActionResult<IEnumerable<StudentViewModel>> Get()
         {
-            return _studentsCRUD.ReadAll();
+            try
+            {
+                var students = _studentsCRUD.ReadAll();
+                return Ok(students);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
 
         [HttpGet("{id}", Name = "GetStudent")]
-        public ActionResult<Student> Get(int id)
+        public ActionResult<StudentViewModel> Get(int id)
         {
             try
             {
@@ -44,21 +51,14 @@ namespace UescColcicAPI.Controllers
         }
 
         [HttpPost(Name = "CreateStudent")]
-        public ActionResult<Student> Post([FromBody] StudentViewModel studentViewModel)
+        public ActionResult Post([FromBody] StudentViewModel studentViewModel)
         {
             try
             {
-                var student = new Student
-                {
-                    Name = studentViewModel.Name,
-                    Email = studentViewModel.Email,
-                    Registration = studentViewModel.Registration,
-                    Course = studentViewModel.Course, 
-                    Bio = studentViewModel.Bio 
-                };
-                _studentsCRUD.Create(student);
+                // Encaminha a criação para o serviço
+                int newStudentId = _studentsCRUD.Create(studentViewModel);
 
-                return CreatedAtRoute("GetStudent", new { id = student.StudentId }, student);
+                return CreatedAtRoute("GetStudent", new { id = newStudentId }, studentViewModel);
             }
             catch (Exception ex)
             {
@@ -77,14 +77,9 @@ namespace UescColcicAPI.Controllers
                     return NotFound($"Student with ID {id} not found.");
                 }
 
-                // Atualiza os campos
-                existingStudent.Name = studentViewModel.Name;
-                existingStudent.Email = studentViewModel.Email;
-                existingStudent.Registration = studentViewModel.Registration;
-                existingStudent.Course = studentViewModel.Course;
-                existingStudent.Bio = studentViewModel.Bio;
+                // Encaminha a atualização para o serviço
+                _studentsCRUD.Update(id, studentViewModel);
 
-                _studentsCRUD.Update(existingStudent);
                 return NoContent();
             }
             catch (Exception ex)
@@ -104,7 +99,9 @@ namespace UescColcicAPI.Controllers
                     return NotFound($"Student with ID {id} not found.");
                 }
 
-                _studentsCRUD.Delete(student);
+                // Encaminha a exclusão para o serviço
+                _studentsCRUD.Delete(id);
+
                 return NoContent();
             }
             catch (Exception ex)
