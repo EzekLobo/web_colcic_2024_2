@@ -3,6 +3,6 @@ using UescColcicAPI.Core;
 
 namespace UescColcicAPI.Services.BD.Interfaces;
 
-public interface IProjectsCRUD : IBaseCRUD<Project>
+public interface IProjectsCRUD 
 {
 }
