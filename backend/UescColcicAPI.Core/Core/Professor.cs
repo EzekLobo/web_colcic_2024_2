@@ -10,7 +10,6 @@ namespace UescColcicAPI.Core
         public string? Department { get; set; }
         public string? Bio { get; set; }
 
-        // Propriedade de navegação para Projetos
-        public List<Project>? Projects { get; set; }
+        public IEnumerable<Project>? Projects { get; set; }
     }
 }

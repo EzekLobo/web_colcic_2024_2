@@ -21,6 +21,7 @@ namespace UescColcicAPI.Services.BD
             {
                 Title = projectViewModel.Title,
                 Description = projectViewModel.Description,
+                Type = projectViewModel.Type,
                 StartDate = projectViewModel.StartDate,
                 EndDate = projectViewModel.EndDate,
                 ProfessorId = projectViewModel.ProfessorId // Associando projeto ao Professor
@@ -69,7 +70,7 @@ namespace UescColcicAPI.Services.BD
             return Find(id);
         }
 
-        public List<Project> ReadAll()
+        public IEnumerable<Project> ReadAll()
         {
             return Projects.Select(project => new Project
             {
@@ -88,7 +89,7 @@ namespace UescColcicAPI.Services.BD
             return Projects.FirstOrDefault(p => p.ProjectId == id);
         }
 
-        public List<Project> GetProjectsByProfessorId(int professorId)
+        public IEnumerable<Project> GetProjectsByProfessorId(int professorId)
         {
             // Retorna todos os projetos associados ao Professor
             return Projects.Where(p => p.ProfessorId == professorId).ToList();

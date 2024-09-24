@@ -10,6 +10,6 @@ public interface IProjectsCRUD : IBaseCRUD<ProjectViewModel, ProjectViewModel>
         void Update(int id, ProjectViewModel project);
         void Delete(int id);
         Project ReadById(int id);
-        List<Project> ReadAll();
-        List<Project> GetProjectsByProfessorId(int professorId);
+        IEnumerable<Project> ReadAll();
+        IEnumerable<Project> GetProjectsByProfessorId(int professorId);
 }

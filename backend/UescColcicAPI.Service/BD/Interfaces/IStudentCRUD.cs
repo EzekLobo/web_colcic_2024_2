@@ -10,6 +10,6 @@ namespace UescColcicAPI.Services.BD.Interfaces
         void Update(int id, StudentViewModel student);
         void Delete(int id);
         Student ReadById(int id);
-        List<Student> ReadAll();
+        IEnumerable<Student> ReadAll();
     }
 }

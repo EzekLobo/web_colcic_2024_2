@@ -79,7 +79,7 @@ namespace UescColcicAPI.Services.BD
             return professor;
         }
 
-        public List<Professor> ReadAll()
+        public IEnumerable<Professor> ReadAll()
         {
             return Professors.Select(professor => 
             {

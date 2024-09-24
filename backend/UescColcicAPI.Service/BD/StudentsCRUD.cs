@@ -89,7 +89,7 @@ namespace UescColcicAPI.Services.BD
             return null;
         }
 
-        public List<Student> ReadAll()
+        public IEnumerable<Student> ReadAll()
         {
             // Converte a lista de Students para StudentViewModels
             return Students.Select(student => new Student

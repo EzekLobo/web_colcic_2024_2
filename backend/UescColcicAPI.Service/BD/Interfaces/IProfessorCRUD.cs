@@ -10,6 +10,6 @@ public interface IProfessorsCRUD : IBaseCRUD<ProfessorViewModel, ProfessorViewMo
     void Update(int id, ProfessorViewModel professor);
     void Delete(int id);
     Professor ReadById(int id);
-    List<Professor> ReadAll();
+    IEnumerable<Professor> ReadAll();
     
 }
