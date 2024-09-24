@@ -11,26 +11,12 @@ namespace UescColcicAPI.Services.BD
     {
         private static readonly List<Project> Projects = new()
         {
-            new Project { ProjectId = 1, Title = "AI Research", Description = "Research on AI applications", Type = "A", StartDate = DateTime.Now.AddMonths(-6), EndDate = DateTime.Now.AddMonths(6), ProfessorId = 1 },
-            new Project { ProjectId = 2, Title = "Blockchain Initiative", Description = "Exploring blockchain for decentralized systems", Type = "B", StartDate = DateTime.Now.AddMonths(-3), EndDate = DateTime.Now.AddMonths(9), ProfessorId = 2 }
-        };
-
-        // Lista de professores simulada (pode ser substituída por uma chamada ao banco de dados)
-        private static readonly List<Professor> Professors = new()
-        {
-            new Professor { ProfessorId = 1, Name = "Dr. John Doe", Email = "john.doe@university.com", Department = "Computer Science", Bio = "Expert in AI and machine learning" },
-            new Professor { ProfessorId = 2, Name = "Dr. Jane Smith", Email = "jane.smith@university.com", Department = "Mathematics", Bio = "Specialist in algebra and number theory" }
+            new Project { ProjectId = 1, Title = "AI Research", Description = "Research on AI applications",Type= "A", StartDate = DateTime.Now.AddMonths(-6), EndDate = DateTime.Now.AddMonths(6), ProfessorId = 1 },
+            new Project { ProjectId = 2, Title = "Blockchain Initiative", Description = "Exploring blockchain for decentralized systems",Type= "B", StartDate = DateTime.Now.AddMonths(-3), EndDate = DateTime.Now.AddMonths(9), ProfessorId = 2 }
         };
 
         public int Create(ProjectViewModel projectViewModel)
         {
-            // Verificar se o professor existe
-            var professorExists = Professors.Any(p => p.ProfessorId == projectViewModel.ProfessorId);
-            if (!professorExists)
-            {
-                throw new InvalidOperationException($"Professor with ID {projectViewModel.ProfessorId} does not exist.");
-            }
-
             var project = new Project
             {
                 Title = projectViewModel.Title,
@@ -59,13 +45,6 @@ namespace UescColcicAPI.Services.BD
                 if (Projects.Any(p => p.Title == projectViewModel.Title && p.ProjectId != id))
                 {
                     throw new InvalidOperationException($"Another project with the title '{projectViewModel.Title}' already exists.");
-                }
-
-                // Verificar se o professor existe ao atualizar
-                var professorExists = Professors.Any(p => p.ProfessorId == projectViewModel.ProfessorId);
-                if (!professorExists)
-                {
-                    throw new InvalidOperationException($"Professor with ID {projectViewModel.ProfessorId} does not exist.");
                 }
 
                 project.Title = projectViewModel.Title;
