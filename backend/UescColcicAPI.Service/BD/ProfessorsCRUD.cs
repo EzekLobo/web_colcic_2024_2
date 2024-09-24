@@ -14,6 +14,14 @@ namespace UescColcicAPI.Services.BD
             new Professor { ProfessorId = 2, Name = "Dr. Jane Smith", Email = "jane.smith@university.com", Department = "Mathematics", Bio = "Specialist in algebra and number theory" }
         };
 
+        private readonly IProjectsCRUD _projectsCRUD;
+
+        // Construtor para injeção de dependência do ProjectsCRUD
+        public ProfessorsCRUD(IProjectsCRUD projectsCRUD)
+        {
+            _projectsCRUD = projectsCRUD;
+        }
+
         public int Create(ProfessorViewModel professorViewModel)
         {
             var professor = new Professor
@@ -62,18 +70,22 @@ namespace UescColcicAPI.Services.BD
 
         public Professor ReadById(int id)
         {
-            return Find(id);
+            var professor = Find(id);
+            if (professor != null)
+            {
+                // Obtendo projetos associados ao professor
+                professor.Projects = _projectsCRUD.GetProjectsByProfessorId(id);
+            }
+            return professor;
         }
 
         public List<Professor> ReadAll()
         {
-            return Professors.Select(professor => new Professor
+            return Professors.Select(professor => 
             {
-                ProfessorId = professor.ProfessorId,
-                Name = professor.Name,
-                Email = professor.Email,
-                Department = professor.Department,
-                Bio = professor.Bio
+                // Obtendo projetos de cada professor
+                professor.Projects = _projectsCRUD.GetProjectsByProfessorId(professor.ProfessorId);
+                return professor;
             }).ToList();
         }
 

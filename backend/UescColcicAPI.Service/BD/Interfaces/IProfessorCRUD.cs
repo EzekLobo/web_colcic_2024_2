@@ -11,4 +11,5 @@ public interface IProfessorsCRUD : IBaseCRUD<ProfessorViewModel, ProfessorViewMo
     void Delete(int id);
     Professor ReadById(int id);
     List<Professor> ReadAll();
+    
 }

@@ -13,8 +13,5 @@ namespace UescColcicAPI.Core
 
         // FK para Professor
         public required int ProfessorId { get; set; }
-
-        // Propriedade de navegação para Professor
-        public Professor? Professor { get; set; }
     }
 }

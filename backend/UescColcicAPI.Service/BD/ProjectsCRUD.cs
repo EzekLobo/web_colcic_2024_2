@@ -11,34 +11,19 @@ namespace UescColcicAPI.Services.BD
     {
         private static readonly List<Project> Projects = new()
         {
-            new Project { ProjectId = 1, Title = "AI Research", Description = "Research on AI applications", Type = "Research", StartDate = DateTime.Now.AddMonths(-6), EndDate = DateTime.Now.AddMonths(6), ProfessorId = 1 },
-            new Project { ProjectId = 2, Title = "Blockchain Initiative", Description = "Exploring blockchain for decentralized systems", Type = "Development", StartDate = DateTime.Now.AddMonths(-3), EndDate = DateTime.Now.AddMonths(9), ProfessorId = 2 }
-        };
-
-        private static readonly List<Professor> Professors = new()
-        {
-            new Professor { ProfessorId = 1, Name = "Dr. John Doe", Email = "john.doe@university.com", Department = "Computer Science", Bio = "Expert in AI and machine learning" },
-            new Professor { ProfessorId = 2, Name = "Dr. Jane Smith", Email = "jane.smith@university.com", Department = "Mathematics", Bio = "Specialist in algebra and number theory" }
+            new Project { ProjectId = 1, Title = "AI Research", Description = "Research on AI applications", StartDate = DateTime.Now.AddMonths(-6), EndDate = DateTime.Now.AddMonths(6), ProfessorId = 1 },
+            new Project { ProjectId = 2, Title = "Blockchain Initiative", Description = "Exploring blockchain for decentralized systems", StartDate = DateTime.Now.AddMonths(-3), EndDate = DateTime.Now.AddMonths(9), ProfessorId = 2 }
         };
 
         public int Create(ProjectViewModel projectViewModel)
         {
-            // Ensure ProfessorId exists
-            var professor = Professors.FirstOrDefault(p => p.ProfessorId == projectViewModel.ProfessorId);
-            if (professor == null)
-            {
-                throw new InvalidOperationException($"Professor with ID {projectViewModel.ProfessorId} does not exist.");
-            }
-
             var project = new Project
             {
                 Title = projectViewModel.Title,
                 Description = projectViewModel.Description,
-                Type = projectViewModel.Type,
                 StartDate = projectViewModel.StartDate,
                 EndDate = projectViewModel.EndDate,
-                ProfessorId = projectViewModel.ProfessorId,
-                Professor = professor // link professor
+                ProfessorId = projectViewModel.ProfessorId // Associando projeto ao Professor
             };
 
             if (Projects.Any(p => p.Title == project.Title))
@@ -56,13 +41,6 @@ namespace UescColcicAPI.Services.BD
             var project = Find(id);
             if (project != null)
             {
-                // Ensure ProfessorId exists
-                var professor = Professors.FirstOrDefault(p => p.ProfessorId == projectViewModel.ProfessorId);
-                if (professor == null)
-                {
-                    throw new InvalidOperationException($"Professor with ID {projectViewModel.ProfessorId} does not exist.");
-                }
-
                 if (Projects.Any(p => p.Title == projectViewModel.Title && p.ProjectId != id))
                 {
                     throw new InvalidOperationException($"Another project with the title '{projectViewModel.Title}' already exists.");
@@ -74,7 +52,6 @@ namespace UescColcicAPI.Services.BD
                 project.StartDate = projectViewModel.StartDate;
                 project.EndDate = projectViewModel.EndDate;
                 project.ProfessorId = projectViewModel.ProfessorId;
-                project.Professor = professor; // link professor
             }
         }
 
@@ -102,14 +79,19 @@ namespace UescColcicAPI.Services.BD
                 Type = project.Type,
                 StartDate = project.StartDate,
                 EndDate = project.EndDate,
-                ProfessorId = project.ProfessorId,
-                Professor = project.Professor
+                ProfessorId = project.ProfessorId
             }).ToList();
         }
 
         private Project? Find(int id)
         {
             return Projects.FirstOrDefault(p => p.ProjectId == id);
+        }
+
+        public List<Project> GetProjectsByProfessorId(int professorId)
+        {
+            // Retorna todos os projetos associados ao Professor
+            return Projects.Where(p => p.ProfessorId == professorId).ToList();
         }
     }
 }

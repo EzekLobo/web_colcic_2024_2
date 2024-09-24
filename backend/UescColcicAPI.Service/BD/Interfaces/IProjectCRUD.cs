@@ -11,4 +11,5 @@ public interface IProjectsCRUD : IBaseCRUD<ProjectViewModel, ProjectViewModel>
         void Delete(int id);
         Project ReadById(int id);
         List<Project> ReadAll();
+        List<Project> GetProjectsByProfessorId(int professorId);
 }
